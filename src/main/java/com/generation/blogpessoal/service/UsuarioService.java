@@ -14,24 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- *  A Classe UsuarioService implementa as regras de negócio do Recurso Usuario.
- *  
- *  Regras de negócio são as particularidades das funcionalidades a serem 
- *  implementadas no objeto, tais como:
- *  
- *  1) O Usuário não pode estar duplicado no Banco de dados
- *  2) A senha do Usuario deve ser criptografada
- *  
- *  Observe que toda a implementação dos metodos Cadastrar, Atualizar e 
- *  Logar estão implmentadas na classe de serviço, enquanto a Classe
- *  Controller se limitará a checar a resposta da requisição.
- */
 
- /**
- * A Anotação @Service indica que esta é uma Classe de Serviço, ou seja,
- * implementa todas regras de negócio do Recurso Usuário.
- */
 
 
 @Service
@@ -40,36 +23,16 @@ public class UsuarioService {
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 	
-	/**
-	 *  Cadastrar Usuário
-	 * 
-	 *  Checa se o usuário já existe no Banco de Dados através do método findByUsuario, 
-	 *  porquê não pode existir 2 usuários com o mesmo email. 
-	 *  Se não existir retorna um Optional vazio.
-	 *  
-	 *  isPresent() -> Se um valor estiver presente retorna true, caso contrário
-	 *  retorna false.
-	 * 
-	 *  empty -> Retorna uma instância de Optional vazia.
-	 */
+	
 	public Optional<Usuario> cadastrarUsuario(Usuario usuario) {
 
 		if (usuarioRepository.findByUsuario(usuario.getUsuario()).isPresent())
 			return Optional.empty();
 		
-		/**
-		 * Se o Usuário não existir no Banco de Dados, a senha será criptografada
-		 * através do Método criptografarSenha.
-		 */
+		
 		usuario.setSenha(criptografarSenha(usuario.getSenha()));
 
-		/**
-		 * Assim como na Expressão Lambda, o resultado do método save será retornado dentro
-		 * de um Optional, com o Usuario persistido no Banco de Dados.
-		 * 
-		 * of​ -> Retorna um Optional com o valor fornecido, mas o valor não pode ser nulo. 
-		 * Se não tiver certeza de que o valor não é nulo use ofNullable.
-		 */
+		
 		return Optional.of(usuarioRepository.save(usuario));
 	
 	}
@@ -176,6 +139,7 @@ public class UsuarioService {
 				usuarioLogin.get().setFoto(usuario.get().getFoto());
 				usuarioLogin.get().setToken(gerarBasicToken(usuarioLogin.get().getUsuario(), usuarioLogin.get().getSenha()));
 				usuarioLogin.get().setSenha(usuario.get().getSenha());
+				usuarioLogin.get().setTipo(usuario.get().getTipo());
 
 				/**
 				 * Retorna o objeto usarioLogin atualizado para a classe UsuarioController.
